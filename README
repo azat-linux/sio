@@ -7,6 +7,9 @@ $ env PATH=$PWD/setup:$PATH run_setup_devices.sh
 $ parse/parse.sh $(ls -t bench-* | head -1) > table.txt
 $ graph/graph.sh < table.txt
 
+Text table viewer:
+$ column -ts$'\t' table.txt | less -R
+
 Issues:
 -------
 - turn off backup/archive for lvm
