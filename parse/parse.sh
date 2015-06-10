@@ -7,16 +7,16 @@ setups=(
     lvm_works
 
     lvm_ext4_works6
-    lvm_xfs_works6
+    lvm_tux3_works6
     lvm_ext4_works4
-    lvm_xfs_works4
+    lvm_tux3_works4
 
     md2_ext4
-    md2_xfs
+    md2_tux3
     md3_ext4
-    md3_xfs
+    md3_tux3
     md4_ext4
-    md4_xfs
+    md4_tux3
 )
 
 self=$(readlink -f $(dirname $0))

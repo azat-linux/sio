@@ -15,10 +15,10 @@ function assert()
 }
 function mounted() { grep -q "^$1 " /proc/mounts; }
 
-function mkfs_xfs() { mkfs.xfs $@; }
-function create_xfs()
+function mkfs_tux3() { tux3 mkfs $@; }
+function create_tux3()
 {
-    mkfs_xfs -f -i size=2048 $@
+    mkfs_tux3 $@
 }
 function create_ext4()
 {
@@ -185,8 +185,8 @@ function setup_devices_generic()
     setup_mount ${1}1 /work_ext4
     shift
     create_partition $1
-    create_xfs ${1}1
-    setup_mount ${1}1 /work_xfs
+    create_tux3 ${1}1
+    setup_mount ${1}1 /work_tux3
     shift
     # regular lvm
     create_lvm ext4-vg ext4-lg $1 $2
@@ -215,7 +215,7 @@ function setup_devices_generic()
 }
 function setup_devices_raid56()
 {
-    # xfs uses blkid_topology_get_minimum_io_size(), so there is no need in
+    # tux3 *don't* uses blkid_topology_get_minimum_io_size(), so there is no need in
     # bypassing this options for it
     local ext4opts="-E stride=$((raidChunkSize/4)),stripe_width=$(((raidChunkSize/4)*(3-1)))"
 
@@ -230,10 +230,10 @@ function setup_devices_raid56()
     setup_mount /dev/md/raid6_ext4_clean /work_md_raid6_ext4_clean
     shift 6
 
-    # raid5 xfs
-    setup_md_raid5_clean raid5_xfs_clean $1 $2 $3
-    create_xfs /dev/md/raid5_xfs_clean
-    setup_mount /dev/md/raid5_xfs_clean /work_md_raid5_xfs_clean
+    # raid5 tux3
+    setup_md_raid5_clean raid5_tux3_clean $1 $2 $3
+    create_tux3 /dev/md/raid5_tux3_clean
+    setup_mount /dev/md/raid5_tux3_clean /work_md_raid5_tux3_clean
     shift 3
 }
 function setup_devices_lvm_all()
@@ -243,7 +243,7 @@ function setup_devices_lvm_all()
     # (and we could do this very simple using db-indexes, to avoid requiring
     # increments, and also we need to do this for other targets).
     #
-    # we also need to test xfs
+    # we also need to test tux3
     create_lvm ext4-vg ext4-lg $@
     create_ext4 /dev/ext4-vg/ext4-lg
     setup_mount /dev/ext4-vg/ext4-lg /work_lvm_all
@@ -277,9 +277,9 @@ function _setup_devices_lvm_all_works()
     done
 }
 function setup_devices_lvm_ext4_works6() { _setup_devices_lvm_all_works ext4 6 $@ ; }
-function setup_devices_lvm_xfs_works6() { _setup_devices_lvm_all_works xfs 6 $@ ; }
+function setup_devices_lvm_tux3_works6() { _setup_devices_lvm_all_works tux3 6 $@ ; }
 function setup_devices_lvm_ext4_works4() { _setup_devices_lvm_all_works ext4 4 $@ ; }
-function setup_devices_lvm_xfs_works4() { _setup_devices_lvm_all_works xfs 4 $@ ; }
+function setup_devices_lvm_tux3_works4() { _setup_devices_lvm_all_works tux3 4 $@ ; }
 function _setup_devices_md_impl()
 {
     function replace()
@@ -332,11 +332,11 @@ function _setup_devices_md()
     _setup_devices_md_impl "mirror_clean_%fs%_%i%" "/work_md_mirror_clean_%fs%_%i%" "$@"
 }
 function setup_devices_md2_ext4() { _setup_devices_md ext4 2 $@ ; }
-function setup_devices_md2_xfs() { _setup_devices_md xfs 2 $@ ; }
+function setup_devices_md2_tux3() { _setup_devices_md tux3 2 $@ ; }
 function setup_devices_md3_ext4() { _setup_devices_md ext4 3 $@ ; }
-function setup_devices_md3_xfs() { _setup_devices_md xfs 3 $@ ; }
+function setup_devices_md3_tux3() { _setup_devices_md tux3 3 $@ ; }
 function setup_devices_md4_ext4() { _setup_devices_md ext4 4 $@ ; }
-function setup_devices_md4_xfs() { _setup_devices_md xfs 4 $@ ; }
+function setup_devices_md4_tux3() { _setup_devices_md tux3 4 $@ ; }
 
 function _setup_devices_md24_ext4() { _setup_devices_md_impl "work%i%" "/work%i%" ext4 "2 2 2 2 4_raid10" $@ ; }
 function setup_devices_md_prod() { _setup_devices_md24_ext4 $@; }
@@ -375,7 +375,7 @@ function printUsage()
     echo "And don't forget to install PATH to:"
     echo " - grants.sh"
     echo " - mke2fs (new version)"
-    echo " - mkfs.xfs (new version)"
+    echo " - tux3 (new version)"
     echo
     echo "Available setupers:"
     echo "- generic"
@@ -384,16 +384,16 @@ function printUsage()
     echo "- lvm_works"
     echo
     echo "- lvm_ext4_works6"
-    echo "- lvm_xfs_works6"
+    echo "- lvm_tux3_works6"
     echo "- lvm_ext4_works4"
-    echo "- lvm_xfs_works4"
+    echo "- lvm_tux3_works4"
     echo
     echo "- md2_ext4"
-    echo "- md2_xfs"
+    echo "- md2_tux3"
     echo "- md3_ext4"
-    echo "- md3_xfs"
+    echo "- md3_tux3"
     echo "- md4_ext4"
-    echo "- md4_xfs"
+    echo "- md4_tux3"
     echo
     echo "- md_prod"
     exit 0
@@ -402,7 +402,7 @@ function setup_dryrun()
 {
     function parted() { echo parted "$@"; }
     function mdadm() { echo mdadm "$@"; }
-    function mkfs_xfs() { echo mkfs.xfs "$@"; }
+    function mkfs_tux3() { echo tux3 mkfs "$@"; }
     function mke2fs() { echo mke2fs "$@"; }
     function vgcreate() { echo vgcreate "$@"; }
     function lvcreate() { echo lvcreate "$@"; }
