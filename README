@@ -4,7 +4,7 @@ sio: scripts for testing servers io
 Example:
 --------
 $ env PATH=$PWD/setup:$PATH run_setup_devices.sh
-$ parse/parse.sh $(ls -t bench-* | head -1) > table.txt
+$ parse/parse.sh $(ls -dt bench-* | head -1) > table.txt
 $ graph/graph.sh < table.txt
 
 Text table viewer:
